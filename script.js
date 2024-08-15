@@ -37,13 +37,17 @@ const markers = pontos.map(ponto =>
 );
 
 const pontosList = document.getElementById('pontos-lista');
+const maxVisibleItems = 4; // Número de itens que serão visíveis inicialmente
+
 pontos.forEach((ponto, index) => {
     const li = document.createElement('li');
     li.innerHTML = `<strong>${ponto.nome}:</strong> ${ponto.endereco}`;
     li.style.cursor = 'pointer';
+    if (index >= maxVisibleItems) {
+        li.classList.add('hidden');
+    }
     li.addEventListener('click', () => {
         document.getElementById('map').scrollIntoView({ behavior: 'smooth' });
-        
         setTimeout(() => {
             map.setView([ponto.lat, ponto.lng], 18);
             markers[index].openPopup();
@@ -52,11 +56,20 @@ pontos.forEach((ponto, index) => {
     pontosList.appendChild(li);
 });
 
-document.getElementById('visitForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Sua solicitação de visita foi enviada com sucesso! Entraremos em contato em breve para confirmar os detalhes.');
-    this.reset();
+const verMaisBtn = document.createElement('button');
+verMaisBtn.id = 'verMaisBtn';
+verMaisBtn.textContent = 'Ver mais';
+verMaisBtn.addEventListener('click', function() {
+    const hiddenItems = document.querySelectorAll('.hidden');
+    hiddenItems.forEach((item, index) => {
+        setTimeout(() => {
+            item.classList.add('show');
+        }, index * 100); // Adiciona um pequeno atraso para cada item
+    });
+    this.style.display = 'none'; // Esconder o botão após clicar
 });
+
+pontosList.parentNode.appendChild(verMaisBtn);
 
 const scrollToTopButton = document.getElementById('scrollToTop');
 
@@ -94,5 +107,21 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.fade-in').forEach(el => {
     observer.observe(el);
+});
+
+const mobileMenu = document.getElementById('mobile-menu');
+const navbarMenu = document.querySelector('.navbar-menu');
+
+mobileMenu.addEventListener('click', function() {
+    mobileMenu.classList.toggle('active');
+    navbarMenu.classList.toggle('active');
+});
+
+// Fecha o menu ao clicar em um link
+document.querySelectorAll('.navbar-menu a').forEach(item => {
+    item.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        navbarMenu.classList.remove('active');
+    });
 });
 
